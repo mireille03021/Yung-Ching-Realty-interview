@@ -1,4 +1,5 @@
 ﻿using interview.Models;
+using interview.Repository;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -12,14 +13,17 @@ namespace interview.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly IEmployeesRepository _employee;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, IEmployeesRepository employee)
         {
-            _logger = logger;
+            this._logger = logger;
+            this._employee = employee;
         }
 
         public IActionResult Index()
         {
+            ViewBag.employee = _employee;
             return View();
         }
 
