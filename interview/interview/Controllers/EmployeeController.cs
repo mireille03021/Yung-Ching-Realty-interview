@@ -1,7 +1,13 @@
 ﻿using interview.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
+using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace interview.Controllers
@@ -10,19 +16,29 @@ namespace interview.Controllers
     {
         private readonly NorthwindContext _context;
 
-        public EmployeeController(NorthwindContext context)
+        private IConfiguration _configuration;
+
+        private string _url;
+
+        private HttpClient _client;
+
+        public EmployeeController(NorthwindContext context, IConfiguration configuration)
         {
-            _context = context;
+            this._context = context;
+            this._configuration = configuration;
+            this._url = this._configuration.GetValue<string>("localURL");
+            this._client = new HttpClient();
         }
 
-        // GET: Employees
+        //員工首頁
         public async Task<IActionResult> Index()
         {
-            var list = _context.Employee;
+            var response = await this._client.GetStringAsync($"{this._url}api/Employee/GetList");
+            var list = JsonConvert.DeserializeObject<List<Employee>>(response);
             return View(await _context.Employee.ToListAsync());
         }
 
-        // GET: Employees/Details/5
+        //員工明細頁
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -30,8 +46,8 @@ namespace interview.Controllers
                 return NotFound();
             }
 
-            var employee = await _context.Employee
-                .FirstOrDefaultAsync(m => m.EmployeeID == id);
+            var response = await this._client.GetStringAsync($"{this._url}api/Employee/Get/{id}");
+            var employee = JsonConvert.DeserializeObject<Employee>(response);
             if (employee == null)
             {
                 return NotFound();
@@ -46,23 +62,22 @@ namespace interview.Controllers
             return View();
         }
 
-        // POST: Employees/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        //新增員工
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("EmployeeID,LastName,FirstName")] Employee employee)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(employee);
-                await _context.SaveChangesAsync();
+                var employeeToJson = JsonConvert.SerializeObject(employee);
+                var content = new StringContent(employeeToJson, Encoding.UTF8, "application/json");
+                await this._client.PostAsync($"{this._url}api/Employee/",content);
                 return RedirectToAction(nameof(Index));
             }
             return View(employee);
         }
 
-        // GET: Employees/Edit/5
+        //編輯頁
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -78,9 +93,7 @@ namespace interview.Controllers
             return View(employee);
         }
 
-        // POST: Employees/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        //編輯員工資訊
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("EmployeeID,LastName,FirstName")] Employee employee)
@@ -94,8 +107,9 @@ namespace interview.Controllers
             {
                 try
                 {
-                    _context.Update(employee);
-                    await _context.SaveChangesAsync();
+                    var employeeToJson = JsonConvert.SerializeObject(employee);
+                    var content = new StringContent(employeeToJson, Encoding.UTF8, "application/json");
+                    var result = await this._client.PutAsync($"{this._url}api/Employee/{id}", content);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -113,16 +127,16 @@ namespace interview.Controllers
             return View(employee);
         }
 
-        // GET: Employees/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        //刪除頁
+        public async Task<IActionResult> DeletePage(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var employee = await _context.Employee
-                .FirstOrDefaultAsync(m => m.EmployeeID == id);
+            var response = await this._client.GetStringAsync($"{this._url}api/Employee/Get/{id}");
+            var employee = JsonConvert.DeserializeObject<Employee>(response);
             if (employee == null)
             {
                 return NotFound();
@@ -131,20 +145,26 @@ namespace interview.Controllers
             return View(employee);
         }
 
-        // POST: Employees/Delete/5
-        [HttpPost, ActionName("Delete")]
+        //刪除員工資訊
+        [ActionName("DeleteConfirmed")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(Employee employee)
         {
-            var employee = await _context.Employee.FindAsync(id);
-            _context.Employee.Remove(employee);
-            await _context.SaveChangesAsync();
+            var response = await this._client.DeleteAsync($"{this._url}api/Employee/{employee.EmployeeID}");
             return RedirectToAction(nameof(Index));
         }
 
+        //判斷員工是否存在
         private bool EmployeeExists(int id)
         {
             return _context.Employee.Any(e => e.EmployeeID == id);
+        }
+
+        private void setHttpClient(string url)
+        {
+            this._client.BaseAddress = new System.Uri($"{this._url}/api/Employee/{url}");
+            this._client.DefaultRequestHeaders.Accept.Clear();
+            this._client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
         }
     }
 }

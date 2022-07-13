@@ -1,5 +1,6 @@
 ﻿using interview.Data;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace interview.Repository
@@ -65,11 +66,17 @@ namespace interview.Repository
         }
 
 
-        //查詢
+        //查詢 By Id
         public Employee getById(int id)
         {
             var employee = this._northwindContext.Employee.FirstOrDefault(x => x.EmployeeID == id);
             return employee;
+        }
+
+        //查詢全部
+        public List<Employee> get()
+        {
+            return this._northwindContext.Employee.ToList();
         }
     }
 }
