@@ -18,7 +18,7 @@ namespace interview.Controllers.WebAPI
             this._employeeRepository = employeesRepository;
         }
 
-        // GET api/<EmployeesWebController>/5
+        // GET api/Employee/{id}
         [HttpGet("{id}")]
         public string Get(int id)
         {
@@ -26,21 +26,21 @@ namespace interview.Controllers.WebAPI
             return JsonConvert.SerializeObject(employee);
         }
 
-        // POST api/<EmployeesWebController>
+        // POST api/Employee
         [HttpPost]
         public bool Post(Employee employee)
         {
             return this._employeeRepository.create(employee);
         }
 
-        // PUT api/<EmployeesWebController>/5
+        // PUT api/Employee/{id}
         [HttpPut("{id}")]
         public bool Put(int id,Employee employee)
         {
             return this._employeeRepository.update(id,employee);
         }
 
-        // DELETE api/<EmployeesWebController>/5
+        // DELETE api/Employee/{id}
         [HttpDelete("{id}")]
         public bool Delete(int id)
         {
