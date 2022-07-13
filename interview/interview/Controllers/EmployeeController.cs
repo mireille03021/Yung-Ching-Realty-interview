@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace interview.Controllers
 {
-    public class EmployeesController : Controller
+    public class EmployeeController : Controller
     {
         private readonly NorthwindContext _context;
 
-        public EmployeesController(NorthwindContext context)
+        public EmployeeController(NorthwindContext context)
         {
             _context = context;
         }
