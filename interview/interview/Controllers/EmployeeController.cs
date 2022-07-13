@@ -51,7 +51,7 @@ namespace interview.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("EmployeeID,LastName,FirstName")] Employees employee)
+        public async Task<IActionResult> Create([Bind("EmployeeID,LastName,FirstName")] Employee employee)
         {
             if (ModelState.IsValid)
             {
@@ -83,7 +83,7 @@ namespace interview.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("EmployeeID,LastName,FirstName")] Employees employee)
+        public async Task<IActionResult> Edit(int id, [Bind("EmployeeID,LastName,FirstName")] Employee employee)
         {
             if (id != employee.EmployeeID)
             {

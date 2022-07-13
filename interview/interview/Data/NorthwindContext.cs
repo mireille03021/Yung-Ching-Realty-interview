@@ -12,11 +12,11 @@ namespace interview.Data
         { 
         }
 
-        public virtual DbSet<Employees> Employee { get; set; }
+        public virtual DbSet<Employee> Employee { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Employees>().ToTable("Employees");
+            modelBuilder.Entity<Employee>().ToTable("Employees");
         }
     }
 }

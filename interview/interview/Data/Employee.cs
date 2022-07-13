@@ -2,9 +2,9 @@
 
 namespace interview.Data
 {
-    public class Employees
+    public class Employee
     {
-        public Employees()
+        public Employee()
         {
         }
 
