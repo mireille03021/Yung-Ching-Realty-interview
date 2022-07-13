@@ -16,8 +16,6 @@ namespace interview.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasAnnotation("Relational:Collation", "Chinese_Taiwan_Stroke_CI_AS");
-
             modelBuilder.Entity<Employees>().ToTable("Employees");
         }
     }
