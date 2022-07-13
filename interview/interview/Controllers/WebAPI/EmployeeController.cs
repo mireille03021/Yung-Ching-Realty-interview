@@ -1,8 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using interview.Data;
+using interview.Repository;
+using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -12,36 +11,40 @@ namespace interview.Controllers.WebAPI
     [ApiController]
     public class EmployeeController : ControllerBase
     {
-        // GET: api/<EmployeesWebController>
-        [HttpGet]
-        public IEnumerable<string> Get()
+        private IEmployeesRepository _employeeRepository;
+
+        public EmployeeController(IEmployeesRepository employeesRepository)
         {
-            return new string[] { "value1", "value2" };
+            this._employeeRepository = employeesRepository;
         }
 
         // GET api/<EmployeesWebController>/5
         [HttpGet("{id}")]
         public string Get(int id)
         {
-            return "value";
+            var employee = this._employeeRepository.getById(id);
+            return JsonConvert.SerializeObject(employee);
         }
 
         // POST api/<EmployeesWebController>
         [HttpPost]
-        public void Post([FromBody] string value)
+        public bool Post(Employee employee)
         {
+            return this._employeeRepository.create(employee);
         }
 
         // PUT api/<EmployeesWebController>/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        public bool Put(int id,Employee employee)
         {
+            return this._employeeRepository.update(id,employee);
         }
 
         // DELETE api/<EmployeesWebController>/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public bool Delete(int id)
         {
+            return this._employeeRepository.deleteById(id);
         }
     }
 }
