@@ -108,3 +108,4 @@ Backup*/
 UpgradeLog*.XML
 
 .vs/
+interview/interview/appsettings.json
